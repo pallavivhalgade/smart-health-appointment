@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Symptom Check History{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold"><i class="bi bi-clock-history me-2"></i>Symptom Check History</h2>
+        <a href="{% url 'symptom_checker' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-2"></i>New Check
+        </a>
+    </div>
+    
+    {% if checks %}
+    <div class="row g-4">
+        {% for check in checks %}
+        <div class="col-lg-6">
+            <div class="card h-100 urgency-{{ check.urgency_level }}">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <span class="badge bg-{{ check.urgency_level == 'high' and 'danger' or check.urgency_level == 'medium' and 'warning' or 'info' }}">
+                        {{ check.urgency_level|title }} Urgency
+                    </span>
+                    <small class="text-muted">{{ check.created_at|date:"M d, Y H:i" }}</small>
+                </div>
+                <div class="card-body">
+                    <h6 class="text-primary"><i class="bi bi-chat-text me-2"></i>Your Symptoms</h6>
+                    <p class="mb-3">{{ check.symptoms_input|truncatechars:150 }}</p>
+                    
+                    <h6 class="text-primary"><i class="bi bi-person-badge me-2"></i>Recommended</h6>
+                    <p class="mb-2">
+                        <span class="specialty-badge">{{ check.recommended_specialty|title }}</span>
+                    </p>
+                    
+                    {% if check.advice %}
+                    <h6 class="text-primary"><i class="bi bi-lightbulb me-2"></i>Advice</h6>
+                    <p class="text-muted small mb-0">{{ check.advice|truncatechars:150 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-clipboard-x display-1 text-muted"></i>
+            <h4 class="mt-3">No Symptom Checks Yet</h4>
+            <p class="text-muted">You haven't used the symptom checker yet.</p>
+            <a href="{% url 'symptom_checker' %}" class="btn btn-primary">
+                <i class="bi bi-clipboard2-pulse me-2"></i>Check Symptoms Now
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

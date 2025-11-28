@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-person-circle me-2"></i>My Profile</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <h5 class="mb-3"><i class="bi bi-person me-2"></i>Personal Information</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">First Name</label>
+                                {{ user_form.first_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Last Name</label>
+                                {{ user_form.last_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                {{ user_form.email }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone</label>
+                                {{ user_form.phone }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Date of Birth</label>
+                                {{ user_form.date_of_birth }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Profile Picture</label>
+                                {{ user_form.profile_picture }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Address</label>
+                                {{ user_form.address }}
+                            </div>
+                        </div>
+                        
+                        {% if user.is_doctor %}
+                        <h5 class="mb-3"><i class="bi bi-briefcase me-2"></i>Professional Information</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Specialization</label>
+                                {{ profile_form.specialization }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Years of Experience</label>
+                                {{ profile_form.experience_years }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Consultation Fee ($)</label>
+                                {{ profile_form.consultation_fee }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Availability</label>
+                                <div class="form-check form-switch mt-2">
+                                    {{ profile_form.is_available }}
+                                    <label class="form-check-label">Available for appointments</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Bio</label>
+                                {{ profile_form.bio }}
+                            </div>
+                        </div>
+                        {% else %}
+                        <h5 class="mb-3"><i class="bi bi-heart-pulse me-2"></i>Medical Information</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Blood Group</label>
+                                {{ profile_form.blood_group }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Emergency Contact</label>
+                                {{ profile_form.emergency_contact }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Medical History</label>
+                                {{ profile_form.medical_history }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Allergies</label>
+                                {{ profile_form.allergies }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

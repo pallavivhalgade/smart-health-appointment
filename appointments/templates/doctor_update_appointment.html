@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Appointment{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-clipboard-check me-2"></i>Update Appointment Status</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5 class="text-primary"><i class="bi bi-person me-2"></i>Patient</h5>
+                            <p class="mb-1"><strong>{{ appointment.patient.get_full_name }}</strong></p>
+                            <p class="mb-0 text-muted">{{ appointment.patient.email }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary"><i class="bi bi-calendar-event me-2"></i>Schedule</h5>
+                            <p class="mb-1"><strong>{{ appointment.date|date:"l, F d, Y" }}</strong></p>
+                            <p class="mb-0 text-muted">{{ appointment.get_time_display }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5 class="text-primary"><i class="bi bi-clipboard me-2"></i>Reason for Visit</h5>
+                        <div class="bg-light p-3 rounded">{{ appointment.reason }}</div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Update Status</label>
+                                {{ form.status }}
+                                <small class="text-muted d-block mt-1">Select the appointment status</small>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Notes for Patient</label>
+                                {{ form.notes }}
+                                <small class="text-muted d-block mt-1">Add any notes or instructions for the patient</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'appointment_detail' appointment.id %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-2"></i>Update Appointment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

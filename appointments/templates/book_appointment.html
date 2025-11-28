@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Appointment{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-calendar-plus me-2"></i>Book an Appointment</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" id="appointment-form" data-testid="appointment-booking-form">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Select Doctor *</label>
+                                {{ form.doctor }}
+                                {% if form.doctor.errors %}
+                                <div class="text-danger small">{{ form.doctor.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Appointment Date *</label>
+                                {{ form.date }}
+                                {% if form.date.errors %}
+                                <div class="text-danger small">{{ form.date.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Time Slot *</label>
+                                {{ form.time_slot }}
+                                <small class="text-muted d-block mt-1">Select date and doctor to see available slots</small>
+                                {% if form.time_slot.errors %}
+                                <div class="text-danger small">{{ form.time_slot.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Reason for Visit *</label>
+                                {{ form.reason }}
+                                <small class="text-muted d-block mt-1">Please describe your symptoms or reason for the appointment</small>
+                                {% if form.reason.errors %}
+                                <div class="text-danger small">{{ form.reason.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary" data-testid="book-appointment-btn">
+                                <i class="bi bi-calendar-check me-2"></i>Book Appointment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Help Card -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5><i class="bi bi-question-circle me-2"></i>Need Help?</h5>
+                    <p class="text-muted mb-2">Not sure which doctor to consult? Use our symptom checker to get personalized recommendations.</p>
+                    <a href="{% url 'symptom_checker' %}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-clipboard2-pulse me-2"></i>Try Symptom Checker
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const doctorSelect = document.querySelector('#id_doctor');
+    const dateInput = document.querySelector('#id_date');
+    const timeSlotSelect = document.querySelector('#id_time_slot');
+    
+    function updateAvailableSlots() {
+        const doctorId = doctorSelect.value;
+        const date = dateInput.value;
+        
+        if (doctorId && date) {
+            fetch(`/appointments/available-slots/?doctor_id=${doctorId}&date=${date}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Clear existing options
+                    timeSlotSelect.innerHTML = '<option value="">Select a time slot</option>';
+                    
+                    if (data.slots && data.slots.length > 0) {
+                        data.slots.forEach(slot => {
+                            const option = document.createElement('option');
+                            option.value = slot.value;
+                            option.textContent = slot.display;
+                            timeSlotSelect.appendChild(option);
+                        });
+                    } else {
+                        const option = document.createElement('option');
+                        option.value = '';
+                        option.textContent = 'No available slots for this date';
+                        timeSlotSelect.appendChild(option);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    }
+    
+    doctorSelect.addEventListener('change', updateAvailableSlots);
+    dateInput.addEventListener('change', updateAvailableSlots);
+});
+</script>
+{% endblock %}

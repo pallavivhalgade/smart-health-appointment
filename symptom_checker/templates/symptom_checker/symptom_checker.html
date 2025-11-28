@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Symptom Checker{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <div class="feature-icon mx-auto mb-3" style="width: 100px; height: 100px;">
+                    <i class="bi bi-robot" style="font-size: 3rem;"></i>
+                </div>
+                <h2 class="fw-bold">AI Symptom Checker</h2>
+                <p class="text-muted">Describe your symptoms and get personalized health recommendations</p>
+            </div>
+            
+            <!-- Symptom Input Form -->
+            <div class="card shadow-lg mb-4">
+                <div class="card-body p-4">
+                    <form method="post" data-testid="symptom-checker-form">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Describe Your Symptoms</label>
+                            <textarea 
+                                name="symptoms" 
+                                class="form-control" 
+                                rows="4" 
+                                placeholder="Example: I've been experiencing headaches and dizziness for the past few days. I also feel tired and have trouble sleeping."
+                                required
+                                data-testid="symptoms-input"
+                            >{% if request.POST.symptoms %}{{ request.POST.symptoms }}{% endif %}</textarea>
+                            <small class="text-muted">Be as detailed as possible about your symptoms, their duration, and any other relevant information.</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100" data-testid="check-symptoms-btn">
+                            <i class="bi bi-search me-2"></i>Analyze Symptoms
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Results -->
+            {% if result %}
+            <div class="card shadow-lg mb-4 urgency-{{ result.urgency }}" data-testid="symptom-results">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-clipboard-data me-2"></i>Analysis Results</h5>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Urgency Level -->
+                    <div class="alert alert-{{ result.urgency_info.color }} mb-4">
+                        <div class="d-flex align-items-center">
+                            {% if result.urgency == 'high' %}
+                            <i class="bi bi-exclamation-triangle-fill fs-3 me-3"></i>
+                            {% elif result.urgency == 'medium' %}
+                            <i class="bi bi-exclamation-circle-fill fs-3 me-3"></i>
+                            {% else %}
+                            <i class="bi bi-info-circle-fill fs-3 me-3"></i>
+                            {% endif %}
+                            <div>
+                                <strong>Urgency Level: {{ result.urgency|title }}</strong>
+                                <p class="mb-0">{{ result.urgency_info.message }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recommended Specialty -->
+                    <div class="mb-4">
+                        <h6 class="text-primary"><i class="bi bi-person-badge me-2"></i>Recommended Specialist</h6>
+                        <div class="bg-light p-3 rounded">
+                            <h5 class="mb-1">{{ result.specialty_info.name }}</h5>
+                            <p class="text-muted mb-0">{{ result.specialty_info.description }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Health Advice -->
+                    <div class="mb-4">
+                        <h6 class="text-primary"><i class="bi bi-heart-pulse me-2"></i>Health Advice</h6>
+                        <p class="mb-0">{{ result.general_advice }}</p>
+                    </div>
+                    
+                    <!-- Matched Conditions -->
+                    {% if result.has_matches and result.matches|length > 1 %}
+                    <div class="mb-4">
+                        <h6 class="text-primary"><i class="bi bi-list-check me-2"></i>Related Conditions Detected</h6>
+                        <ul class="list-unstyled">
+                            {% for match in result.matches %}
+                            <li class="mb-2">
+                                <span class="badge bg-primary me-2">{{ match.keyword_matched }}</span>
+                                <small class="text-muted">→ {{ match.specialty|title }}</small>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Recommended Doctors -->
+            {% if doctors %}
+            <div class="card shadow-lg">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-people me-2"></i>Recommended Doctors</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        {% for doctor in doctors %}
+                        <div class="col-md-6">
+                            <div class="card doctor-card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="bg-primary text-white rounded-circle p-2 me-2">
+                                            <i class="bi bi-person-badge"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">Dr. {{ doctor.user.get_full_name }}</h6>
+                                            <small class="text-muted">{{ doctor.experience_years }} years exp.</small>
+                                        </div>
+                                    </div>
+                                    <p class="mb-2"><small><i class="bi bi-currency-dollar me-1"></i>${{ doctor.consultation_fee }}</small></p>
+                                    {% if user.is_authenticated and user.is_patient %}
+                                    <a href="{% url 'book_appointment' %}" class="btn btn-outline-primary btn-sm w-100">
+                                        <i class="bi bi-calendar-plus me-1"></i>Book
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endif %}
+            
+            <!-- Disclaimer -->
+            <div class="alert alert-warning mt-4">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <strong>Disclaimer:</strong> This symptom checker is for informational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,150 @@
+{
+  "symptoms": {
+    "chest_pain": {
+      "keywords": ["chest pain", "chest tightness", "heart pain", "chest discomfort", "angina"],
+      "specialty": "cardiologist",
+      "urgency": "high",
+      "advice": "Chest pain can be a sign of heart problems. Please seek immediate medical attention if the pain is severe, accompanied by shortness of breath, or radiates to the arm or jaw."
+    },
+    "headache": {
+      "keywords": ["headache", "migraine", "head pain", "tension headache", "throbbing head"],
+      "specialty": "neurology",
+      "urgency": "medium",
+      "advice": "Headaches can have many causes including stress, dehydration, or eye strain. Rest in a dark room, stay hydrated, and consider over-the-counter pain relief. Consult a neurologist if headaches are frequent or severe."
+    },
+    "skin_rash": {
+      "keywords": ["rash", "skin rash", "itchy skin", "hives", "eczema", "skin irritation", "red spots"],
+      "specialty": "dermatologist",
+      "urgency": "low",
+      "advice": "Skin rashes can result from allergies, infections, or skin conditions. Keep the area clean and dry. Avoid scratching. A dermatologist can provide proper diagnosis and treatment."
+    },
+    "stomach_pain": {
+      "keywords": ["stomach pain", "abdominal pain", "belly ache", "gastric pain", "indigestion", "bloating", "nausea"],
+      "specialty": "gastroenterology",
+      "urgency": "medium",
+      "advice": "Stomach pain can indicate digestive issues. Try eating smaller meals, avoiding spicy foods, and staying hydrated. If pain persists or is severe, consult a gastroenterologist."
+    },
+    "joint_pain": {
+      "keywords": ["joint pain", "knee pain", "back pain", "shoulder pain", "arthritis", "bone pain", "muscle pain"],
+      "specialty": "orthopedic",
+      "urgency": "medium",
+      "advice": "Joint and muscle pain can result from injury, overuse, or conditions like arthritis. Rest the affected area, apply ice, and consider over-the-counter pain relief. An orthopedic specialist can help with persistent issues."
+    },
+    "ear_problem": {
+      "keywords": ["ear pain", "hearing loss", "ear infection", "tinnitus", "ear ringing", "blocked ear"],
+      "specialty": "ent",
+      "urgency": "medium",
+      "advice": "Ear problems can affect hearing and balance. Avoid inserting objects into the ear. An ENT specialist can diagnose and treat ear conditions effectively."
+    },
+    "throat_problem": {
+      "keywords": ["sore throat", "throat pain", "difficulty swallowing", "tonsils", "hoarse voice"],
+      "specialty": "ent",
+      "urgency": "low",
+      "advice": "Sore throats are often caused by viral infections. Gargle with warm salt water, stay hydrated, and rest your voice. See an ENT if symptoms persist beyond a week."
+    },
+    "child_health": {
+      "keywords": ["child sick", "baby fever", "child cough", "pediatric", "child rash", "infant", "toddler sick"],
+      "specialty": "pediatrician",
+      "urgency": "high",
+      "advice": "Children require specialized medical care. Monitor symptoms closely and ensure proper hydration. Consult a pediatrician for any concerning symptoms in children."
+    },
+    "mental_health": {
+      "keywords": ["anxiety", "depression", "stress", "panic attack", "insomnia", "mood swings", "mental health"],
+      "specialty": "psychiatry",
+      "urgency": "medium",
+      "advice": "Mental health is as important as physical health. Practice self-care, maintain social connections, and don't hesitate to seek professional help. A psychiatrist can provide appropriate treatment and support."
+    },
+    "diabetes": {
+      "keywords": ["diabetes", "high blood sugar", "frequent urination", "excessive thirst", "weight loss unexplained", "thyroid"],
+      "specialty": "endocrinology",
+      "urgency": "medium",
+      "advice": "Hormonal and metabolic conditions require specialized care. Maintain a healthy diet, exercise regularly, and monitor your blood sugar levels. An endocrinologist can help manage these conditions."
+    },
+    "fever": {
+      "keywords": ["fever", "high temperature", "chills", "sweating", "body ache"],
+      "specialty": "general_physician",
+      "urgency": "medium",
+      "advice": "Fever is often the body's response to infection. Rest, stay hydrated, and take fever-reducing medication if needed. Seek medical attention if fever is very high or persists for more than 3 days."
+    },
+    "cold_flu": {
+      "keywords": ["cold", "flu", "runny nose", "cough", "sneezing", "congestion", "sinus"],
+      "specialty": "general_physician",
+      "urgency": "low",
+      "advice": "Common cold and flu usually resolve on their own. Rest, drink plenty of fluids, and consider over-the-counter medications for symptom relief. See a doctor if symptoms worsen or persist."
+    },
+    "breathing_difficulty": {
+      "keywords": ["shortness of breath", "breathing difficulty", "wheezing", "asthma", "breathlessness"],
+      "specialty": "general_physician",
+      "urgency": "high",
+      "advice": "Breathing difficulties can be serious. If you experience severe shortness of breath, seek emergency care immediately. For chronic issues, consult with a physician."
+    },
+    "fatigue": {
+      "keywords": ["fatigue", "tiredness", "exhaustion", "low energy", "weakness"],
+      "specialty": "general_physician",
+      "urgency": "low",
+      "advice": "Persistent fatigue can have many causes including poor sleep, stress, or underlying health conditions. Ensure adequate rest, balanced nutrition, and regular exercise. Consult a doctor if fatigue persists."
+    },
+    "heart_palpitations": {
+      "keywords": ["heart palpitations", "irregular heartbeat", "racing heart", "skipped heartbeat"],
+      "specialty": "cardiologist",
+      "urgency": "high",
+      "advice": "Heart palpitations can be alarming but are often harmless. However, if accompanied by chest pain, dizziness, or fainting, seek immediate medical attention."
+    }
+  },
+  "specialties": {
+    "general_physician": {
+      "name": "General Physician",
+      "description": "For general health concerns, routine check-ups, and initial consultations"
+    },
+    "cardiologist": {
+      "name": "Cardiologist",
+      "description": "Specializes in heart and cardiovascular system conditions"
+    },
+    "dermatologist": {
+      "name": "Dermatologist",
+      "description": "Specializes in skin, hair, and nail conditions"
+    },
+    "pediatrician": {
+      "name": "Pediatrician",
+      "description": "Specializes in medical care for infants, children, and adolescents"
+    },
+    "orthopedic": {
+      "name": "Orthopedic",
+      "description": "Specializes in bones, joints, muscles, and related conditions"
+    },
+    "ent": {
+      "name": "ENT (Ear, Nose, Throat)",
+      "description": "Specializes in ear, nose, and throat conditions"
+    },
+    "gastroenterology": {
+      "name": "Gastroenterologist",
+      "description": "Specializes in digestive system and gastrointestinal conditions"
+    },
+    "neurology": {
+      "name": "Neurologist",
+      "description": "Specializes in brain, spine, and nervous system conditions"
+    },
+    "psychiatry": {
+      "name": "Psychiatrist",
+      "description": "Specializes in mental health and psychiatric conditions"
+    },
+    "endocrinology": {
+      "name": "Endocrinologist",
+      "description": "Specializes in hormonal and metabolic conditions"
+    }
+  },
+  "urgency_levels": {
+    "high": {
+      "color": "danger",
+      "message": "This requires urgent attention. Please consult a doctor as soon as possible."
+    },
+    "medium": {
+      "color": "warning",
+      "message": "Schedule an appointment within the next few days if symptoms persist."
+    },
+    "low": {
+      "color": "info",
+      "message": "Monitor your symptoms. Consult a doctor if they worsen or don't improve."
+    }
+  }
+}
