@@ -17,8 +17,7 @@ def home(request):
         'doctors': doctors,
         'total_doctors': DoctorProfile.objects.filter(is_available=True).count(),
     }
-    return render(request, 'home.html', context)
-
+    return render(request, 'accounts/home.html', context)
 
 def register_patient(request):
     if request.user.is_authenticated:

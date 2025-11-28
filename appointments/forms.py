@@ -4,12 +4,17 @@ from datetime import datetime, timedelta
 from .models import Appointment, TimeSlot
 from accounts.models import DoctorProfile
 
-
 class AppointmentBookingForm(forms.ModelForm):
     date = forms.DateField(
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
     )
     
+    doctor = forms.ModelChoiceField(
+        queryset=DoctorProfile.objects.none(),
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        empty_label="Select a doctor",
+    )
+
     class Meta:
         model = Appointment
         fields = ['doctor', 'date', 'time_slot', 'reason']
@@ -22,12 +27,15 @@ class AppointmentBookingForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-        self.fields['doctor'].queryset = DoctorProfile.objects.filter(is_available=True)
-        self.fields['doctor'].label_from_instance = lambda obj: f"Dr. {obj.user.get_full_name()} - {obj.get_specialization_display()} (${obj.consultation_fee})"
-        
-        # Set minimum date to today
+
+        self.fields['doctor'].queryset = DoctorProfile.objects.all()
+        self.fields['doctor'].label_from_instance = lambda obj: f"Dr. {obj.user.get_full_name()} - {obj.get_specialization_display()}"
+
+
+        # Set date limits
         self.fields['date'].widget.attrs['min'] = timezone.now().date().isoformat()
         self.fields['date'].widget.attrs['max'] = (timezone.now().date() + timedelta(days=30)).isoformat()
+
 
     def clean_date(self):
         date = self.cleaned_data.get('date')
