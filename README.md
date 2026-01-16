@@ -2,8 +2,10 @@
 
 A backend-focused healthcare appointment management web application built using Django, designed to support structured workflows, data validation, and production-ready deployment.
 
-🔗 Live Demo: [View Application][live-demo]  
-📂 Source Code: [View Repository][source-code]
+🔗 [live-demo]: https://smart-health-appointment-1.onrender.com  
+📂 [source-code]: https://github.com/pallavivhalgade/smart-health-appointment
+  
+
 
 ---
 
