@@ -9,9 +9,12 @@
         <div class="row align-items-center">
             <div class="col-lg-6">
                 <h1 class="display-4 fw-bold mb-4">Your Health, Our Priority</h1>
-                <p class="lead mb-4">Book appointments with top doctors, check your symptoms with our AI-powered tool, and manage your healthcare journey - all in one place.</p>
+                <p class="lead mb-4">Find a specialist, explore appointment scheduling, and keep your healthcare visits organized in one place.</p>
                 <div class="d-flex gap-3 flex-wrap">
-                    {% if user.is_authenticated %}
+                    {% if demo_mode %}
+                    <a href="{% url 'doctor_list' %}" class="btn btn-light btn-lg px-4">Explore sample doctors</a>
+                    <a href="{% url 'symptom_checker' %}" class="btn btn-outline-light btn-lg px-4">Try the symptom checker</a>
+                    {% elif user.is_authenticated %}
                     <a href="{% url 'book_appointment' %}" class="btn btn-light btn-lg px-4">
                         <i class="bi bi-calendar-plus me-2"></i>Book Appointment
                     </a>
@@ -59,8 +62,8 @@
                     <div class="feature-icon">
                         <i class="bi bi-robot"></i>
                     </div>
-                    <h4>AI Symptom Checker</h4>
-                    <p class="text-muted">Get instant health guidance based on your symptoms. Know which specialist to consult.</p>
+                    <h4>Symptom Checker</h4>
+                    <p class="text-muted">Explore how keyword matching suggests a specialty. This educational tool does not provide a diagnosis.</p>
                 </div>
             </div>
             <div class="col-md-4">
@@ -68,8 +71,8 @@
                     <div class="feature-icon">
                         <i class="bi bi-shield-check"></i>
                     </div>
-                    <h4>Trusted Doctors</h4>
-                    <p class="text-muted">Connect with verified and experienced healthcare professionals across specializations.</p>
+                    <h4>Doctor Directory</h4>
+                    <p class="text-muted">Browse doctor profiles and filter by specialization to find relevant services.</p>
                 </div>
             </div>
         </div>
@@ -81,8 +84,8 @@
 <section class="py-5 bg-light">
     <div class="container">
         <div class="text-center mb-5">
-            <h2 class="fw-bold">Our Top Doctors</h2>
-            <p class="text-muted">Meet our experienced healthcare professionals</p>
+            <h2 class="fw-bold">{% if demo_mode %}Sample Doctor Directory{% else %}Available Doctors{% endif %}</h2>
+            <p class="text-muted">Explore profiles across different specializations</p>
         </div>
         <div class="row g-4">
             {% for doctor in doctors %}
@@ -130,7 +133,7 @@
     <div class="container">
         <div class="card bg-primary text-white text-center p-5">
             <h2 class="fw-bold mb-3">Not Sure Which Doctor to Consult?</h2>
-            <p class="lead mb-4">Use our AI-powered symptom checker to get personalized recommendations</p>
+            <p class="lead mb-4">Explore specialty suggestions using our educational keyword-based symptom checker</p>
             <div>
                 <a href="{% url 'symptom_checker' %}" class="btn btn-light btn-lg px-5">
                     <i class="bi bi-clipboard2-pulse me-2"></i>Try Symptom Checker
@@ -147,8 +150,8 @@
             <div class="col-md-3 col-6">
                 <div class="stat-card">
                     <i class="bi bi-people-fill"></i>
-                    <div class="stat-number">{{ total_doctors|default:"10" }}+</div>
-                    <div>Verified Doctors</div>
+                    <div class="stat-number">{{ total_doctors }}</div>
+                    <div>{% if demo_mode %}Sample Doctors{% else %}Available Doctors{% endif %}</div>
                 </div>
             </div>
             <div class="col-md-3 col-6">
@@ -161,15 +164,15 @@
             <div class="col-md-3 col-6">
                 <div class="stat-card">
                     <i class="bi bi-calendar-check-fill"></i>
-                    <div class="stat-number">24/7</div>
-                    <div>Online Booking</div>
+                    <div class="stat-number">2</div>
+                    <div>Account Roles</div>
                 </div>
             </div>
             <div class="col-md-3 col-6">
                 <div class="stat-card">
                     <i class="bi bi-emoji-smile-fill"></i>
-                    <div class="stat-number">100%</div>
-                    <div>Satisfaction</div>
+                    <div class="stat-number">4</div>
+                    <div>Appointment Statuses</div>
                 </div>
             </div>
         </div>

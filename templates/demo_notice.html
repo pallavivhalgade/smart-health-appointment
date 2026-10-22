@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Explore the demo{% endblock %}
+{% block content %}
+<section class="container py-5 text-center">
+    <div class="card p-5 mx-auto" style="max-width: 640px;">
+        <h1 class="h2">Explore SmartHealth</h1>
+        <p>This browsing demo uses fictional doctors. Registration, login, and appointment changes are unavailable here.</p>
+        <p class="text-muted">The full application supports patient and doctor accounts, scheduling, and appointment management when connected to a persistent database.</p>
+        <a class="btn btn-primary" href="{% url 'doctor_list' %}">Browse sample doctors</a>
+    </div>
+</section>
+{% endblock %}

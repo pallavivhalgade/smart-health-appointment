@@ -6,7 +6,7 @@
 <div class="container py-5">
     <div class="text-center mb-5">
         <h2 class="fw-bold"><i class="bi bi-people me-2"></i>Find a Doctor</h2>
-        <p class="text-muted">Browse our network of verified healthcare professionals</p>
+        <p class="text-muted">{% if demo_mode %}Explore fictional profiles and filter by specialization.{% else %}Browse available doctor profiles by specialization.{% endif %}</p>
     </div>
     
     <!-- Filters -->
@@ -14,10 +14,10 @@
         <div class="card-body">
             <form method="get" class="row g-3 align-items-center">
                 <div class="col-auto">
-                    <label class="form-label mb-0">Filter by Specialization:</label>
+                    <label class="form-label mb-0" for="specialization">Filter by Specialization:</label>
                 </div>
                 <div class="col-md-4">
-                    <select name="specialization" class="form-select" onchange="this.form.submit()">
+                    <select id="specialization" name="specialization" class="form-select" onchange="this.form.submit()">
                         <option value="">All Specializations</option>
                         {% for value, label in specializations %}
                         <option value="{{ value }}" {% if specialization_filter == value %}selected{% endif %}>{{ label }}</option>
@@ -60,12 +60,14 @@
                         </p>
                         <p class="mb-0">
                             <i class="bi bi-check-circle text-success me-2"></i>
-                            <span class="text-success">Available for appointments</span>
+                            <span class="text-success">{% if demo_mode %}Fictional demo profile{% else %}Available for appointments{% endif %}</span>
                         </p>
                     </div>
                 </div>
                 <div class="card-footer bg-white">
-                    {% if user.is_authenticated and user.is_patient %}
+                    {% if demo_mode %}
+                    <span class="text-muted small">Booking is unavailable in this demo.</span>
+                    {% elif user.is_authenticated and user.is_patient %}
                     <a href="{% url 'book_appointment' %}?doctor={{ doctor.id }}" class="btn btn-primary w-100">
                         <i class="bi bi-calendar-plus me-2"></i>Book Appointment
                     </a>

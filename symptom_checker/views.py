@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from .models import SymptomCheck
 from .analyzer import SymptomAnalyzer
 from accounts.models import DoctorProfile
@@ -15,6 +16,8 @@ def symptom_checker(request):
         
         if not symptoms_input:
             messages.error(request, 'Please describe your symptoms.')
+        elif len(symptoms_input) > 2000:
+            messages.error(request, 'Please keep your description under 2,000 characters.')
         else:
             analyzer = SymptomAnalyzer()
             result = analyzer.analyze(symptoms_input)
@@ -27,7 +30,7 @@ def symptom_checker(request):
                 )[:4]
             
             # Save the check if user is logged in
-            if request.user.is_authenticated:
+            if request.user.is_authenticated and not settings.DEMO_MODE:
                 SymptomCheck.objects.create(
                     user=request.user,
                     symptoms_input=symptoms_input,

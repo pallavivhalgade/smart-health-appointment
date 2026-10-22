@@ -1,85 +1,106 @@
 # SmartHealth Appointment Management System
 
-A backend-focused healthcare appointment management web application built using Django, designed to support structured workflows, data validation, and production-ready deployment.
+A Django application for managing appointments between patients and doctors, with role-based dashboards and an educational symptom checker.
 
-🔗 [live-demo]: https://smart-health-appointment-1.onrender.com  
-📂 [source-code]: https://github.com/pallavivhalgade/smart-health-appointment
-  
-
-
----
+[Source code](https://github.com/pallavivhalgade/smart-health-appointment)
 
 ## Overview
 
-SmartHealth is a role-based appointment management system that enables secure scheduling between patients and doctors.  
-The application emphasizes backend engineering, database integrity, and deployment readiness rather than UI complexity.
+Patients can register, browse doctors by specialization, book a time slot, and manage their appointments. Doctors can review requests, update appointment status, and add notes. Each account can access its own appointments and symptom history.
 
----
+The symptom checker matches text against a local keyword dataset to suggest a specialty. It is not an AI diagnostic model or a substitute for medical care. Doctor self-registration does not verify professional credentials.
 
 ## Technology Stack
 
-- Backend: Python, Django  
-- Database: SQLite  
-- Frontend: Django Templates, HTML, CSS  
-- Deployment: Render, Gunicorn, WhiteNoise  
-- Version Control: Git, GitHub  
-
----
+- Python 3.12 and Django 5.2 LTS
+- SQLite for local development; PostgreSQL for writable cloud deployments
+- Django templates, Bootstrap, and shared CSS
+- Vercel, with Gunicorn and WhiteNoise available for other hosts
+- Django tests and GitHub Actions
 
 ## Core Features
 
-- Role-based authentication (Admin / Doctor / Patient)
-- Appointment scheduling and management
-- Backend data validation and consistency checks
-- Secure authentication and authorization workflows
-- Production-ready static file handling
+- Patient and doctor registration, authentication, and profile management
+- Public doctor directory with specialization filters
+- Booking, editing, cancellation, and doctor status updates
+- Validation for unavailable doctors, elapsed slots, and a 30-day booking window
+- Database protection against duplicate active bookings; cancelled slots can be booked again
+- Keyword-based specialty suggestions and private history for signed-in users
+- A read-only browsing demo with fictional profiles
 
----
+## Project Structure
 
-## Engineering Practices
+```text
+accounts/           Users, profiles, registration, dashboards, and demo seed command
+appointments/       Scheduling models, forms, availability rules, and views
+symptom_checker/    Keyword dataset, analyzer, views, and history
+smarthealth/        Django settings, URLs, middleware, and health endpoint
+templates/          Shared layout and demo notice
+static/css/         Shared site styles
+scripts/            Vercel build preparation
+docs/               Deployment instructions
+.github/workflows/  Automated validation
+```
 
-- Modular Django app architecture
-- Data preprocessing and validation
-- Unit testing and debugging
-- Technical documentation
-- Cloud deployment using WSGI server
+Virtual environments, database files, uploads, bytecode, secrets, and build output are excluded from version control. Previously tracked copies are removed from the current tree; Git history is unchanged.
 
----
+## Run Locally
+
+```sh
+git clone https://github.com/pallavivhalgade/smart-health-appointment.git
+cd smart-health-appointment
+python -m venv .venv
+```
+
+Activate the environment on Windows:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Or on macOS/Linux:
+
+```sh
+source .venv/bin/activate
+```
+
+Copy `.env.example` to `.env`, then install dependencies and initialize an empty local database:
+
+```sh
+python -m pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
+
+Open <http://127.0.0.1:8000/>. Register a doctor and patient to try the booking workflow. For administration, run `python manage.py createsuperuser` and visit `/admin/`.
+
+The development server serves static assets automatically. If PowerShell prevents activation, run commands directly with `.\.venv\Scripts\python.exe`.
+
+## Validation
+
+```sh
+python manage.py collectstatic --noinput
+python manage.py check
+python manage.py makemigrations --check --dry-run
+python manage.py test
+```
+
+Tests cover cancelled-slot reuse, duplicate active bookings, date limits, elapsed slots, authorization, registration rollback, CSRF, logout, demo write restrictions, and symptom-history isolation. GitHub Actions runs these checks on pushes and pull requests.
 
 ## Deployment
 
-- Hosted on cloud infrastructure
-- Served using Gunicorn WSGI server
-- Static assets managed with WhiteNoise
-- Dependency management via `requirements.txt`
+See [deployment instructions](docs/deployment.md) for Vercel environment variables, PostgreSQL setup, and alternative hosting.
 
----
+| Mode | Storage | Available workflows |
+| --- | --- | --- |
+| Local development | Local SQLite | Full application |
+| Vercel browsing demo | Generated read-only SQLite with fictional profiles | Directory, specialty filters, example symptom checks |
+| Full cloud application | External PostgreSQL | Accounts and persistent appointments; profile uploads require object storage |
 
-## How to Clone and Run Locally
+Vercel deployments default to the browsing demo when no `DATABASE_URL` is configured. Account and appointment writes are disabled in that mode. Persistent booking requires PostgreSQL; an ephemeral SQLite database would lose changes between function instances.
 
-### Clone the Repository
-```bash
-git clone [source-code]
-cd smart-health-appointment
-Create and Activate Virtual Environment
-python -m venv env
-env\Scripts\activate
-
-### Install Dependencies
-pip install -r requirements.txt
-
-### Apply Migrations and Run
-python manage.py migrate
-python manage.py collectstatic
-python manage.py runserver
-
-
-### Author
+## Author
 
 Pallavi Vijay Vholgade
+
 B.E. Artificial Intelligence & Machine Learning
-
-
-
----
-

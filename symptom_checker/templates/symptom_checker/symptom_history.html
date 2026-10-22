@@ -17,7 +17,7 @@
         <div class="col-lg-6">
             <div class="card h-100 urgency-{{ check.urgency_level }}">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <span class="badge bg-{{ check.urgency_level == 'high' and 'danger' or check.urgency_level == 'medium' and 'warning' or 'info' }}">
+                    <span class="badge {% if check.urgency_level == 'high' %}bg-danger{% elif check.urgency_level == 'medium' %}bg-warning{% else %}bg-info{% endif %}">
                         {{ check.urgency_level|title }} Urgency
                     </span>
                     <small class="text-muted">{{ check.created_at|date:"M d, Y H:i" }}</small>

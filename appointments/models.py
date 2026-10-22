@@ -1,6 +1,3 @@
-from django.db import models
-
-# Create your models here.
 import uuid
 from django.db import models
 from django.utils import timezone
@@ -61,7 +58,14 @@ class Appointment(models.Model):
 
     class Meta:
         ordering = ['-date', '-time_slot']
-        unique_together = ['doctor', 'date', 'time_slot']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['doctor', 'date', 'time_slot'],
+                condition=models.Q(status__in=['pending', 'confirmed']),
+                name='unique_active_doctor_slot',
+                violation_error_message='This time slot is already booked. Please choose another.',
+            ),
+        ]
 
     def __str__(self):
         return f"{self.patient.get_full_name()} with Dr. {self.doctor.user.get_full_name()} on {self.date} at {self.time_slot}"
@@ -69,8 +73,11 @@ class Appointment(models.Model):
     @property
     def is_upcoming(self):
         from datetime import datetime
-        appointment_datetime = datetime.combine(self.date, datetime.strptime(self.time_slot, '%H:%M').time())
-        return appointment_datetime > datetime.now()
+        appointment_datetime = timezone.make_aware(
+            datetime.combine(self.date, datetime.strptime(self.time_slot, '%H:%M').time()),
+            timezone.get_current_timezone(),
+        )
+        return appointment_datetime > timezone.now()
 
     @property
     def can_cancel(self):

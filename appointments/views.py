@@ -2,11 +2,27 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-from django.utils import timezone
-from datetime import datetime, timedelta
-from .models import Appointment, TimeSlot
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError, transaction
+from datetime import datetime
+from .models import Appointment
 from .forms import AppointmentBookingForm, AppointmentEditForm, DoctorAppointmentUpdateForm
 from accounts.models import DoctorProfile
+from .availability import available_slots
+
+
+def save_appointment(form, patient=None):
+    """Handle a slot taken between form validation and the database write."""
+    try:
+        with transaction.atomic():
+            appointment = form.save(commit=False)
+            if patient is not None:
+                appointment.patient = patient
+            appointment.save()
+    except IntegrityError:
+        form.add_error(None, 'This time slot was just booked. Please choose another.')
+        return False
+    return True
 
 
 @login_required
@@ -17,14 +33,11 @@ def book_appointment(request):
     
     if request.method == 'POST':
         form = AppointmentBookingForm(request.POST, user=request.user)
-        if form.is_valid():
-            appointment = form.save(commit=False)
-            appointment.patient = request.user
-            appointment.save()
+        if form.is_valid() and save_appointment(form, patient=request.user):
             messages.success(request, 'Appointment booked successfully! Waiting for doctor confirmation.')
             return redirect('my_appointments')
     else:
-        form = AppointmentBookingForm(user=request.user)
+        form = AppointmentBookingForm(user=request.user, initial={'doctor': request.GET.get('doctor', '')})
     
     doctors = DoctorProfile.objects.filter(is_available=True)
     context = {
@@ -85,8 +98,7 @@ def edit_appointment(request, appointment_id):
     
     if request.method == 'POST':
         form = AppointmentEditForm(request.POST, instance=appointment)
-        if form.is_valid():
-            form.save()
+        if form.is_valid() and save_appointment(form):
             messages.success(request, 'Appointment updated successfully!')
             return redirect('appointment_detail', appointment_id=appointment_id)
     else:
@@ -137,8 +149,7 @@ def doctor_update_appointment(request, appointment_id):
     
     if request.method == 'POST':
         form = DoctorAppointmentUpdateForm(request.POST, instance=appointment)
-        if form.is_valid():
-            form.save()
+        if form.is_valid() and save_appointment(form):
             messages.success(request, 'Appointment updated successfully!')
             return redirect('appointment_detail', appointment_id=appointment_id)
     else:
@@ -158,37 +169,19 @@ def get_available_slots(request):
     date_str = request.GET.get('date')
     
     if not doctor_id or not date_str:
-        return JsonResponse({'slots': [], 'error': 'Missing parameters'})
+        return JsonResponse({'slots': [], 'error': 'Missing parameters'}, status=400)
     
     try:
         doctor = DoctorProfile.objects.get(id=doctor_id)
         date = datetime.strptime(date_str, '%Y-%m-%d').date()
-    except (DoctorProfile.DoesNotExist, ValueError):
-        return JsonResponse({'slots': [], 'error': 'Invalid parameters'})
+    except (DoctorProfile.DoesNotExist, ValueError, ValidationError):
+        return JsonResponse({'slots': [], 'error': 'Invalid parameters'}, status=400)
     
-    # Get all possible slots
-    all_slots = dict(TimeSlot.TIME_CHOICES)
-    
-    # Get booked slots for this doctor on this date
-    booked_slots = Appointment.objects.filter(
-        doctor=doctor,
-        date=date,
-        status__in=['pending', 'confirmed']
-    ).values_list('time_slot', flat=True)
-    
-    # Filter out booked slots
-    available_slots = [
-        {'value': slot, 'display': display}
-        for slot, display in all_slots.items()
-        if slot not in booked_slots
-    ]
-    
-    return JsonResponse({'slots': available_slots})
+    return JsonResponse({'slots': available_slots(doctor, date)})
 
 
-@login_required
 def doctor_list(request):
-    doctors = DoctorProfile.objects.filter(is_available=True)
+    doctors = DoctorProfile.objects.filter(is_available=True).select_related('user')
     
     specialization_filter = request.GET.get('specialization', '')
     if specialization_filter:

@@ -3,16 +3,18 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
+from django.views.decorators.http import require_POST
+from django.utils import timezone
 from .forms import (
     PatientRegistrationForm, DoctorRegistrationForm, CustomLoginForm,
     PatientProfileForm, DoctorProfileForm, UserUpdateForm
 )
-from .models import DoctorProfile
+from .models import DoctorProfile, PatientProfile
 from appointments.models import Appointment
 
 
 def home(request):
-    doctors = DoctorProfile.objects.filter(is_available=True)[:6]
+    doctors = DoctorProfile.objects.filter(is_available=True).select_related('user')[:6]
     context = {
         'doctors': doctors,
         'total_doctors': DoctorProfile.objects.filter(is_available=True).count(),
@@ -61,6 +63,7 @@ class CustomLoginView(LoginView):
         return super().form_valid(form)
 
 
+@require_POST
 def logout_view(request):
     logout(request)
     messages.info(request, 'You have been logged out successfully.')
@@ -77,7 +80,7 @@ def dashboard(request):
             doctor_profile = user.doctor_profile
             upcoming_appointments = Appointment.objects.filter(
                 doctor=doctor_profile,
-                status='confirmed'
+                status='confirmed', date__gte=timezone.localdate()
             ).order_by('date', 'time_slot')[:5]
             pending_appointments = Appointment.objects.filter(
                 doctor=doctor_profile,
@@ -101,14 +104,14 @@ def dashboard(request):
             ).order_by('-date', '-time_slot')[:5]
             upcoming_appointments = Appointment.objects.filter(
                 patient=user,
-                status__in=['confirmed', 'pending']
+                status__in=['confirmed', 'pending'], date__gte=timezone.localdate()
             ).order_by('date', 'time_slot')[:5]
             context.update({
                 'patient_profile': patient_profile,
                 'my_appointments': my_appointments,
                 'upcoming_appointments': upcoming_appointments,
             })
-        except:
+        except PatientProfile.DoesNotExist:
             pass
         return render(request, 'accounts/patient_dashboard.html', context)
 

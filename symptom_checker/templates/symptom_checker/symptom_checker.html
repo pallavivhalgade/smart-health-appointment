@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}AI Symptom Checker{% endblock %}
+{% block title %}Symptom Checker{% endblock %}
 
 {% block content %}
 <div class="container py-5">
@@ -11,8 +11,8 @@
                 <div class="feature-icon mx-auto mb-3" style="width: 100px; height: 100px;">
                     <i class="bi bi-robot" style="font-size: 3rem;"></i>
                 </div>
-                <h2 class="fw-bold">AI Symptom Checker</h2>
-                <p class="text-muted">Describe your symptoms and get personalized health recommendations</p>
+                <h2 class="fw-bold">Symptom Checker</h2>
+                <p class="text-muted">An educational keyword-matching tool for exploring specialties. It cannot diagnose conditions or rule out emergencies.</p>
             </div>
             
             <!-- Symptom Input Form -->
@@ -21,16 +21,18 @@
                     <form method="post" data-testid="symptom-checker-form">
                         {% csrf_token %}
                         <div class="mb-4">
-                            <label class="form-label fw-bold">Describe Your Symptoms</label>
+                            <label class="form-label fw-bold" for="symptoms">{% if demo_mode %}Try an example description{% else %}Describe Your Symptoms{% endif %}</label>
                             <textarea 
                                 name="symptoms" 
+                                id="symptoms"
+                                maxlength="2000"
                                 class="form-control" 
                                 rows="4" 
                                 placeholder="Example: I've been experiencing headaches and dizziness for the past few days. I also feel tired and have trouble sleeping."
                                 required
                                 data-testid="symptoms-input"
                             >{% if request.POST.symptoms %}{{ request.POST.symptoms }}{% endif %}</textarea>
-                            <small class="text-muted">Be as detailed as possible about your symptoms, their duration, and any other relevant information.</small>
+                            <small class="text-muted">{% if demo_mode %}Use fictional text, such as "headache and dizziness". Input and results are not saved.{% else %}Maximum 2,000 characters. Signed-in checks are saved to your symptom history.{% endif %}</small>
                         </div>
                         <button type="submit" class="btn btn-primary w-100" data-testid="check-symptoms-btn">
                             <i class="bi bi-search me-2"></i>Analyze Symptoms
@@ -81,7 +83,7 @@
                     <!-- Matched Conditions -->
                     {% if result.has_matches and result.matches|length > 1 %}
                     <div class="mb-4">
-                        <h6 class="text-primary"><i class="bi bi-list-check me-2"></i>Related Conditions Detected</h6>
+                        <h6 class="text-primary"><i class="bi bi-list-check me-2"></i>Matched Keywords</h6>
                         <ul class="list-unstyled">
                             {% for match in result.matches %}
                             <li class="mb-2">

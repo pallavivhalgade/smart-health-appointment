@@ -1,1 +1,1 @@
-web: gunicorn appointment_system.wsgi
+web: gunicorn smarthealth.wsgi:application

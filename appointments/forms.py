@@ -1,10 +1,27 @@
 from django import forms
 from django.utils import timezone
-from datetime import datetime, timedelta
+from datetime import timedelta
 from .models import Appointment, TimeSlot
 from accounts.models import DoctorProfile
+from .availability import slot_is_future, validate_booking_date
 
-class AppointmentBookingForm(forms.ModelForm):
+
+class SchedulingValidationMixin:
+    def clean_date(self):
+        date = self.cleaned_data['date']
+        error = validate_booking_date(date)
+        if error:
+            raise forms.ValidationError(error)
+        return date
+
+    def clean(self):
+        cleaned = super().clean()
+        date, slot = cleaned.get('date'), cleaned.get('time_slot')
+        if date and slot and not slot_is_future(date, slot):
+            self.add_error('time_slot', 'Choose a time slot that has not already passed.')
+        return cleaned
+
+class AppointmentBookingForm(SchedulingValidationMixin, forms.ModelForm):
     date = forms.DateField(
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
     )
@@ -28,22 +45,14 @@ class AppointmentBookingForm(forms.ModelForm):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
-        self.fields['doctor'].queryset = DoctorProfile.objects.all()
+        self.fields['doctor'].queryset = DoctorProfile.objects.filter(is_available=True).select_related('user')
         self.fields['doctor'].label_from_instance = lambda obj: f"Dr. {obj.user.get_full_name()} - {obj.get_specialization_display()}"
 
 
         # Set date limits
-        self.fields['date'].widget.attrs['min'] = timezone.now().date().isoformat()
-        self.fields['date'].widget.attrs['max'] = (timezone.now().date() + timedelta(days=30)).isoformat()
+        self.fields['date'].widget.attrs['min'] = timezone.localdate().isoformat()
+        self.fields['date'].widget.attrs['max'] = (timezone.localdate() + timedelta(days=30)).isoformat()
 
-
-    def clean_date(self):
-        date = self.cleaned_data.get('date')
-        if date < timezone.now().date():
-            raise forms.ValidationError('Cannot book appointments in the past.')
-        if date > timezone.now().date() + timedelta(days=30):
-            raise forms.ValidationError('Cannot book appointments more than 30 days in advance.')
-        return date
 
     def clean(self):
         cleaned_data = super().clean()
@@ -67,7 +76,7 @@ class AppointmentBookingForm(forms.ModelForm):
         return cleaned_data
 
 
-class AppointmentEditForm(forms.ModelForm):
+class AppointmentEditForm(SchedulingValidationMixin, forms.ModelForm):
     date = forms.DateField(
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
     )
@@ -82,14 +91,8 @@ class AppointmentEditForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['date'].widget.attrs['min'] = timezone.now().date().isoformat()
-        self.fields['date'].widget.attrs['max'] = (timezone.now().date() + timedelta(days=30)).isoformat()
-
-    def clean_date(self):
-        date = self.cleaned_data.get('date')
-        if date < timezone.now().date():
-            raise forms.ValidationError('Cannot book appointments in the past.')
-        return date
+        self.fields['date'].widget.attrs['min'] = timezone.localdate().isoformat()
+        self.fields['date'].widget.attrs['max'] = (timezone.localdate() + timedelta(days=30)).isoformat()
 
     def clean(self):
         cleaned_data = super().clean()

@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.conf import settings
+from django.db import transaction
 from .models import User, DoctorProfile, PatientProfile
 
 
@@ -23,6 +25,7 @@ class PatientRegistrationForm(UserCreationForm):
             field.widget.attrs['class'] = 'form-control'
             field.widget.attrs['placeholder'] = field.label
 
+    @transaction.atomic
     def save(self, commit=True):
         user = super().save(commit=False)
         user.user_type = 'patient'
@@ -40,7 +43,7 @@ class DoctorRegistrationForm(UserCreationForm):
     specialization = forms.ChoiceField(choices=DoctorProfile.SPECIALIZATION_CHOICES)
     license_number = forms.CharField(max_length=50, required=True)
     experience_years = forms.IntegerField(min_value=0, required=True)
-    consultation_fee = forms.DecimalField(max_digits=10, decimal_places=2, initial=500.00)
+    consultation_fee = forms.DecimalField(max_digits=10, decimal_places=2, min_value=0, initial=500.00)
 
     class Meta:
         model = User
@@ -52,6 +55,13 @@ class DoctorRegistrationForm(UserCreationForm):
             field.widget.attrs['class'] = 'form-control'
             field.widget.attrs['placeholder'] = field.label
 
+    def clean_license_number(self):
+        license_number = self.cleaned_data['license_number'].strip()
+        if DoctorProfile.objects.filter(license_number=license_number).exists():
+            raise forms.ValidationError('A doctor with this license number is already registered.')
+        return license_number
+
+    @transaction.atomic
     def save(self, commit=True):
         user = super().save(commit=False)
         user.user_type = 'doctor'
@@ -123,5 +133,7 @@ class UserUpdateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if not settings.ALLOW_PROFILE_UPLOADS:
+            self.fields.pop('profile_picture', None)
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
