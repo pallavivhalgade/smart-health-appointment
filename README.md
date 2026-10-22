@@ -2,7 +2,7 @@
 
 A Django application for managing appointments between patients and doctors, with role-based dashboards and an educational symptom checker.
 
-[Source code](https://github.com/pallavivhalgade/smart-health-appointment)
+[Live browsing demo](https://smart-health-appointment-pi.vercel.app) · [Source code](https://github.com/pallavivhalgade/smart-health-appointment)
 
 ## Overview
 

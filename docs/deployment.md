@@ -2,6 +2,8 @@
 
 ## Vercel browsing demo
 
+Current deployment: <https://smart-health-appointment-pi.vercel.app>.
+
 Vercel detects Django through `manage.py`. `pyproject.toml` selects the WSGI entrypoint and runs `scripts/vercel_build.py`; Vercel collects static files automatically.
 
 Set these environment variables in the Vercel project:
