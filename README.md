@@ -4,6 +4,44 @@ A Django application for managing appointments between patients and doctors, wit
 
 [Live browsing demo](https://smart-health-appointment-pi.vercel.app) · [Source code](https://github.com/pallavivhalgade/smart-health-appointment)
 
+<a id="system-architecture"></a>
+## 🏗️ System Architecture
+
+The normal scheduling path checks identity, role, slot availability, and database constraints. The symptom helper is a separate keyword-based feature, not a diagnostic AI model. The hosted browsing demo is read-only; writable deployments need persistent storage.
+
+```mermaid
+flowchart TD
+    U["Patient or doctor"] --> UI["Django templates and views"]
+    UI --> AUTH["Authentication and role checks"]
+    AUTH --> RULES["Availability and booking validation"]
+    RULES --> ORM["Django ORM and appointment constraints"]
+    ORM --> DB["SQLite locally or configured PostgreSQL"]
+    DB --> DASH["Role-based appointment dashboards"]
+    UI --> SYM["Optional keyword symptom matching"]
+    SYM --> SPECIALTY["Specialty suggestion"]
+    class U entry
+    class UI,AUTH,RULES,ORM,SYM process
+    class DB system
+    class DASH,SPECIALTY output
+    classDef entry fill:#EAF2FF,stroke:#5275AD,color:#1E3556
+    classDef process fill:#F0EBFA,stroke:#8870B2,color:#3B2856
+    classDef system fill:#FFF2DA,stroke:#AA8440,color:#51401E
+    classDef output fill:#E3F4EC,stroke:#4C8A72,color:#234C3B
+    classDef pending fill:#F8E9E7,stroke:#AD706A,color:#653C37,stroke-dasharray:5 5
+```
+
+<details>
+<summary><strong>Follow the implementation</strong></summary>
+
+| Stage | Source |
+| --- | --- |
+| Booking and role flow | [appointments/views.py](appointments/views.py) |
+| Database constraints | [appointments/models.py](appointments/models.py) |
+| Database and demo configuration | [smarthealth/settings.py](smarthealth/settings.py) |
+| Keyword matcher | [symptom_checker/analyzer.py](symptom_checker/analyzer.py) |
+
+</details>
+
 ## Overview
 
 Patients can register, browse doctors by specialization, book a time slot, and manage their appointments. Doctors can review requests, update appointment status, and add notes. Each account can access its own appointments and symptom history.
